@@ -1,0 +1,1736 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="en"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta</p>
+<p class="p1"><span class="Apple-converted-space">    </span>name="viewport"</p>
+<p class="p1"><span class="Apple-converted-space">    </span>content="width=device-width, initial-scale=1.0"</p>
+<p class="p1"><span class="Apple-converted-space">  </span>/&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;Teacher ↔ Student Live Translator&lt;/title&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;!--</p>
+<p class="p1"><span class="Apple-converted-space">    </span>REAL-TIME LIBRARY</p>
+<p class="p1"><span class="Apple-converted-space">    </span>-----------------</p>
+<p class="p1"><span class="Apple-converted-space">    </span>MQTT.js connects the two browsers through HiveMQ's public MQTT broker.</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>No API key is needed for this public demo version.</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>IMPORTANT:</p>
+<p class="p1"><span class="Apple-converted-space">    </span>HiveMQ's public broker is shared and should not be used for confidential</p>
+<p class="p1"><span class="Apple-converted-space">    </span>student information.</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>This app reduces exposure by:</p>
+<p class="p1"><span class="Apple-converted-space">      </span>1. Hashing the Session Name before using it as an MQTT topic.</p>
+<p class="p1"><span class="Apple-converted-space">      </span>2. Encrypting every message with AES-GCM before publishing it.</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>For stronger security, replace the public broker with your own free</p>
+<p class="p1"><span class="Apple-converted-space">    </span>HiveMQ Cloud broker or another authenticated realtime provider.</p>
+<p class="p1"><span class="Apple-converted-space">  </span>--&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="https://unpkg.com/mqtt@5.15.2/dist/mqtt.min.js"&gt;&lt;/script&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>:root {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--bg: #f5f7fb;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--card: #ffffff;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--text: #18202b;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--muted: #667085;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--border: #dce3ec;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--primary: #3457d5;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--primary-dark: #2847b8;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--success: #12805c;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--danger: #b42318;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--warning: #9a6700;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--soft-blue: #eef3ff;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--soft-green: #ecfdf3;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--soft-red: #fef3f2;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--shadow: 0 16px 45px rgba(17, 24, 39, 0.08);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--radius: 22px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>* {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>box-sizing: border-box;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>html,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>body {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin: 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>min-height: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-family:</p>
+<p class="p1"><span class="Apple-converted-space">        </span>Inter,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>system-ui,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>-apple-system,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>BlinkMacSystemFont,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"Segoe UI",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>sans-serif;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--bg);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: var(--text);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>body {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 22px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>button,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>input,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>textarea {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font: inherit;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>button {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>cursor: pointer;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.app {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: min(1050px, 100%);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin: 0 auto;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.header {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>text-align: center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 22px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.header h1 {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin: 0 0 8px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: clamp(1.8rem, 4vw, 2.7rem);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.1;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.header p {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin: 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: var(--muted);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.card {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--card);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: var(--radius);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>box-shadow: var(--shadow);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: clamp(20px, 4vw, 34px);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.label {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: block;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 700;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 9px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.95rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.role-heading {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>text-align: center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1.05rem;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 800;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.role-buttons {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: grid;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>grid-template-columns: repeat(2, 1fr);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>gap: 12px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.role-btn {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 2px solid var(--border);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: #fff;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 17px 14px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1rem;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 800;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: var(--text);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>transition: 0.15s ease;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.role-btn:hover {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-color: var(--primary);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>transform: translateY(-1px);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.role-btn.active {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--primary);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: #fff;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-color: var(--primary);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.session-row {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: grid;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>grid-template-columns: 1fr auto;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>gap: 12px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 22px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.session-input {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>min-width: 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 2px solid var(--border);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 15px 16px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>outline: none;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1.05rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.session-input:focus,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>textarea:focus {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-color: var(--primary);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>box-shadow: 0 0 0 4px rgba(52, 87, 213, 0.10);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.join-btn {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 14px 22px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--primary);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: white;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 800;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>min-width: 120px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.join-btn:hover {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--primary-dark);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.helper {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: var(--muted);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.87rem;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.5;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.status {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 15px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 12px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 10px 13px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.91rem;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 700;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: #f2f4f7;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: #475467;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>align-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>gap: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.status-dot {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>height: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 999px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>flex-shrink: 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: #98a2b3;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.status.connected {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--soft-green);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: var(--success);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.status.connected .status-dot {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--success);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.status.error {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--soft-red);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: var(--danger);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.status.error .status-dot {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--danger);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.hidden {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: none !important;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.panel-title {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin: 0 0 6px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1.55rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.panel-subtitle {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin: 0 0 22px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: var(--muted);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.5;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.mic-wrap {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>text-align: center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 12px 0 24px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.mic-btn {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: 105px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>height: 105px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 999px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--primary);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: white;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 2.5rem;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>box-shadow: 0 10px 30px rgba(52, 87, 213, 0.25);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>transition: 0.2s ease;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.mic-btn:hover {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>transform: scale(1.04);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.mic-btn.listening {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--danger);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>animation: pulse 1.5s infinite;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>@keyframes pulse {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>0% {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>box-shadow: 0 0 0 0 rgba(180, 35, 24, 0.35);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>70% {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>box-shadow: 0 0 0 22px rgba(180, 35, 24, 0);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>100% {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>box-shadow: 0 0 0 0 rgba(180, 35, 24, 0);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.mic-label {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 13px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 800;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.live-caption {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>min-height: 76px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--soft-blue);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 23px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1.08rem;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.55;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.live-caption strong {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: block;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.83rem;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>text-transform: uppercase;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: 0.05em;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 6px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: var(--primary);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>textarea {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>resize: vertical;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>min-height: 120px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 2px solid var(--border);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 15px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>outline: none;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.5;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.send-btn {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 12px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 15px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--text);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: white;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 800;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.translation-preview {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 17px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 15px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: #f8fafc;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.translation-preview .small {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: block;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: var(--muted);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.8rem;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 800;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>text-transform: uppercase;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>letter-spacing: 0.05em;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 7px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>#teacherSpanishPreview {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1.25rem;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.5;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.student-card {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>min-height: 480px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>flex-direction: column;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.student-top {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>justify-content: space-between;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>align-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>gap: 12px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 24px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.student-room {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: var(--muted);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.9rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.live-badge {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: inline-flex;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>gap: 7px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>align-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 8px 12px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 999px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--soft-green);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: var(--success);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 800;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.85rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.live-badge span {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: 9px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>height: 9px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--success);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 999px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.spanish-display {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>flex: 1;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>justify-content: center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>align-items: center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>text-align: center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: clamp(20px, 5vw, 50px);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: #fbfcfe;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 2px solid #e7ecf3;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 22px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: clamp(2.2rem, 7vw, 5rem);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 800;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.17;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>word-break: break-word;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>min-height: 300px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.spanish-display.waiting {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: #98a2b3;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: clamp(1.5rem, 4vw, 2.4rem);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 600;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.speaker-btn {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 18px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 18px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--primary);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: white;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1.15rem;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 800;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.speaker-btn:disabled {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>opacity: 0.45;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>cursor: not-allowed;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.timestamp {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>text-align: center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: var(--muted);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 11px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>min-height: 22px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.84rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.notice {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 14px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: #fff9e8;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: var(--warning);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 12px 14px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 15px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>line-height: 1.45;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.88rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.loading {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>opacity: 0.6;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>pointer-events: none;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>@media (max-width: 650px) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>body {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>padding: 12px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>.card {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>padding: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>border-radius: 18px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>.session-row {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>grid-template-columns: 1fr;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>.join-btn {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>.student-top {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>align-items: flex-start;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>flex-direction: column;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;main class="app"&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;header class="header"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;h1&gt;Live English → Spanish&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;p&gt;Teacher speaks or types. Student receives the Spanish translation live.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/header&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- =========================================</p>
+<p class="p1"><span class="Apple-converted-space">         </span>ROLE + SESSION</p>
+<p class="p1"><span class="Apple-converted-space">    </span>========================================== --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;section class="card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="role-heading"&gt;Choose your screen&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="role-buttons"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">          </span>id="teacherRoleBtn"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>class="role-btn"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>type="button"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>👩‍🏫 I am the Teacher</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">          </span>id="studentRoleBtn"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>class="role-btn"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>type="button"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>🎓 I am the Student</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="session-row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input</p>
+<p class="p1"><span class="Apple-converted-space">          </span>id="sessionInput"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>class="session-input"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>type="text"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>maxlength="80"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>autocomplete="off"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>spellcheck="false"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>placeholder="Enter Session Name — example: Room101-K7M4Q9"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>aria-label="Session Name"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>/&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">          </span>id="joinBtn"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>class="join-btn"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>type="button"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>Connect</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="helper"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>Teacher and student must enter the &lt;strong&gt;exact same Session Name&lt;/strong&gt;.</p>
+<p class="p1"><span class="Apple-converted-space">        </span>For better privacy, use a hard-to-guess name such as</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;strong&gt;Room101-K7M4Q9&lt;/strong&gt; instead of simply Room101.</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="connectionStatus" class="status"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;span class="status-dot"&gt;&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;span id="connectionStatusText"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>Choose Teacher or Student, enter a Session Name, then Connect.</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="notice"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>Do not transmit confidential student records, grades, medical information,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>passwords, or personally identifiable information through the public-broker version.</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- =========================================</p>
+<p class="p1"><span class="Apple-converted-space">         </span>TEACHER SCREEN</p>
+<p class="p1"><span class="Apple-converted-space">    </span>========================================== --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;section id="teacherPanel" class="card hidden"&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;h2 class="panel-title"&gt;Teacher Screen&lt;/h2&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;p class="panel-subtitle"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>Speak in English or type a message. Completed speech phrases are translated</p>
+<p class="p1"><span class="Apple-converted-space">        </span>into Spanish and sent to the connected student screen.</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/p&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="mic-wrap"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">          </span>id="micBtn"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>class="mic-btn"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>type="button"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>aria-label="Start microphone"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>🎤</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="micLabel" class="mic-label"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>Tap to start speaking</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="live-caption"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;strong&gt;English Speech&lt;/strong&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;span id="speechPreview"&gt;Your speech will appear here.&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;label class="label" for="manualInput"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>Or type a message</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/label&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;textarea</p>
+<p class="p1"><span class="Apple-converted-space">        </span>id="manualInput"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>placeholder="Type an English message here..."</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&gt;&lt;/textarea&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">        </span>id="sendBtn"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>class="send-btn"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>type="button"</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>Translate &amp; Send</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="translation-preview"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;span class="small"&gt;Spanish being sent&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="teacherSpanishPreview"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>Nothing sent yet.</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- =========================================</p>
+<p class="p1"><span class="Apple-converted-space">         </span>STUDENT SCREEN</p>
+<p class="p1"><span class="Apple-converted-space">    </span>========================================== --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;section id="studentPanel" class="card student-card hidden"&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="student-top"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;h2 class="panel-title"&gt;Spanish Translation&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div id="studentRoomName" class="student-room"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="live-badge"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;span&gt;&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>LIVE</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div</p>
+<p class="p1"><span class="Apple-converted-space">        </span>id="spanishDisplay"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>class="spanish-display waiting"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>aria-live="polite"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>aria-atomic="true"</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>Waiting for the teacher…</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">        </span>id="speakerBtn"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>class="speaker-btn"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>type="button"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>disabled</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>🔊 Listen in Spanish</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="messageTime" class="timestamp"&gt;&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/section&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/main&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* ==========================================================</p>
+<p class="p1"><span class="Apple-converted-space">       </span>CONFIGURATION</p>
+<p class="p1"><span class="Apple-converted-space">       </span>========================================================== */</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">      </span>Public HiveMQ secure WebSocket broker.</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>This requires NO API key.</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>For a classroom pilot, this provides a completely serverless</p>
+<p class="p1"><span class="Apple-converted-space">      </span>way for separate browsers/devices to communicate.</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>For production/private data:</p>
+<p class="p1"><span class="Apple-converted-space">      </span>Create a free authenticated HiveMQ Cloud broker and replace</p>
+<p class="p1"><span class="Apple-converted-space">      </span>BROKER_URL. You would also add the username/password in the</p>
+<p class="p1"><span class="Apple-converted-space">      </span>MQTT connection options.</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>WARNING:</p>
+<p class="p1"><span class="Apple-converted-space">      </span>Putting permanent broker credentials directly inside public</p>
+<p class="p1"><span class="Apple-converted-space">      </span>HTML is NOT appropriate for strong production security.</p>
+<p class="p1"><span class="Apple-converted-space">    </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const BROKER_URL = "wss://broker.hivemq.com:8884/mqtt";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">      </span>Translation API:</p>
+<p class="p1"><span class="Apple-converted-space">      </span>MyMemory supports calls such as:</p>
+<p class="p1"><span class="Apple-converted-space">      </span>https://api.mymemory.translated.net/get?q=Hello&amp;langpair=en|es</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>No API key is required for basic usage.</p>
+<p class="p1"><span class="Apple-converted-space">      </span>Free services may have rate limits or usage restrictions.</p>
+<p class="p1"><span class="Apple-converted-space">    </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const TRANSLATE_URL =</p>
+<p class="p1"><span class="Apple-converted-space">      </span>"https://api.mymemory.translated.net/get";</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* ==========================================================</p>
+<p class="p1"><span class="Apple-converted-space">       </span>DOM ELEMENTS</p>
+<p class="p1"><span class="Apple-converted-space">       </span>========================================================== */</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const teacherRoleBtn =</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById("teacherRoleBtn");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const studentRoleBtn =</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById("studentRoleBtn");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const sessionInput =</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById("sessionInput");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const joinBtn =</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById("joinBtn");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const teacherPanel =</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById("teacherPanel");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const studentPanel =</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById("studentPanel");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const connectionStatus =</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById("connectionStatus");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const connectionStatusText =</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById("connectionStatusText");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const micBtn =</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById("micBtn");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const micLabel =</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById("micLabel");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const speechPreview =</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById("speechPreview");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const manualInput =</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById("manualInput");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const sendBtn =</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById("sendBtn");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const teacherSpanishPreview =</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById("teacherSpanishPreview");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const spanishDisplay =</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById("spanishDisplay");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const speakerBtn =</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById("speakerBtn");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const messageTime =</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById("messageTime");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const studentRoomName =</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById("studentRoomName");</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* ==========================================================</p>
+<p class="p1"><span class="Apple-converted-space">       </span>APP STATE</p>
+<p class="p1"><span class="Apple-converted-space">       </span>========================================================== */</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let selectedRole = null;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let currentRoom = "";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let topicName = "";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let encryptionKey = null;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let mqttClient = null;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let recognition = null;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let isListening = false;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let latestSpanish = "";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">      </span>Prevent rapid duplicate SpeechRecognition final events</p>
+<p class="p1"><span class="Apple-converted-space">      </span>from sending exactly the same sentence multiple times.</p>
+<p class="p1"><span class="Apple-converted-space">    </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let lastSpeechText = "";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let lastSpeechTime = 0;</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* ==========================================================</p>
+<p class="p1"><span class="Apple-converted-space">       </span>ROLE SELECTION</p>
+<p class="p1"><span class="Apple-converted-space">       </span>========================================================== */</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>teacherRoleBtn.addEventListener("click", () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>selectRole("teacher");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>studentRoleBtn.addEventListener("click", () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>selectRole("student");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function selectRole(role) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>selectedRole = role;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>teacherRoleBtn.classList.toggle(</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"active",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>role === "teacher"</p>
+<p class="p1"><span class="Apple-converted-space">      </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>studentRoleBtn.classList.toggle(</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"active",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>role === "student"</p>
+<p class="p1"><span class="Apple-converted-space">      </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">        </span>Do not show the operational screen until the room</p>
+<p class="p1"><span class="Apple-converted-space">        </span>connection has actually been requested.</p>
+<p class="p1"><span class="Apple-converted-space">      </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">      </span>teacherPanel.classList.add("hidden");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>studentPanel.classList.add("hidden");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>setStatus(</p>
+<p class="p1"><span class="Apple-converted-space">        </span>`Selected ${role === "teacher" ? "Teacher" : "Student"}. Enter the shared Session Name and press Connect.`,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"normal"</p>
+<p class="p1"><span class="Apple-converted-space">      </span>);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* ==========================================================</p>
+<p class="p1"><span class="Apple-converted-space">       </span>SESSION CONNECTION</p>
+<p class="p1"><span class="Apple-converted-space">       </span>========================================================== */</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>joinBtn.addEventListener("click", connectToRoom);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>sessionInput.addEventListener("keydown", event =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (event.key === "Enter") {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>connectToRoom();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function connectToRoom() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!selectedRole) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>setStatus(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"Please choose Teacher or Student first.",</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"error"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const room = sessionInput.value.trim();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (room.length &lt; 4) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>setStatus(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"Please enter a Session Name with at least 4 characters.",</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"error"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">        </span>Close a previous connection if the user changes rooms.</p>
+<p class="p1"><span class="Apple-converted-space">      </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (mqttClient) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>mqttClient.end(true);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>console.warn(error);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>currentRoom = room;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>setStatus(</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"Preparing encrypted classroom connection…",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"normal"</p>
+<p class="p1"><span class="Apple-converted-space">      </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>joinBtn.disabled = true;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>joinBtn.textContent = "Connecting…";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">          </span>Derive both:</p>
+<p class="p1"><span class="Apple-converted-space">          </span>1. A non-obvious MQTT topic.</p>
+<p class="p1"><span class="Apple-converted-space">          </span>2. An encryption key.</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>The real Session Name is therefore never used as</p>
+<p class="p1"><span class="Apple-converted-space">          </span>the broker topic.</p>
+<p class="p1"><span class="Apple-converted-space">        </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">        </span>topicName = await createHashedTopic(currentRoom);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>encryptionKey = await deriveEncryptionKey(currentRoom);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>openMqttConnection();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>console.error(error);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>setStatus(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"Unable to prepare this room. Try another Session Name.",</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"error"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>joinBtn.disabled = false;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>joinBtn.textContent = "Connect";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function openMqttConnection() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const clientId =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"class_translate_" +</p>
+<p class="p1"><span class="Apple-converted-space">        </span>crypto.randomUUID().replaceAll("-", "");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>mqttClient = mqtt.connect(</p>
+<p class="p1"><span class="Apple-converted-space">        </span>BROKER_URL,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">          </span>clientId,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>clean: true,</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">            </span>Automatically try again if Google Sites,</p>
+<p class="p1"><span class="Apple-converted-space">            </span>school Wi-Fi, or the device temporarily loses</p>
+<p class="p1"><span class="Apple-converted-space">            </span>the WebSocket.</p>
+<p class="p1"><span class="Apple-converted-space">          </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">          </span>reconnectPeriod: 1500,</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>connectTimeout: 10000,</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>keepalive: 30</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>);</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>mqttClient.on("connect", () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>console.log("MQTT connected.");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>mqttClient.subscribe(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>topicName,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>qos: 1</p>
+<p class="p1"><span class="Apple-converted-space">          </span>},</p>
+<p class="p1"><span class="Apple-converted-space">          </span>error =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (error) {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>console.error(error);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>setStatus(</p>
+<p class="p1"><span class="Apple-converted-space">                </span>"Connected to the service, but could not join the classroom channel.",</p>
+<p class="p1"><span class="Apple-converted-space">                </span>"error"</p>
+<p class="p1"><span class="Apple-converted-space">              </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>joinBtn.disabled = false;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>joinBtn.textContent = "Reconnect";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>setStatus(</p>
+<p class="p1"><span class="Apple-converted-space">              </span>`Connected to "${currentRoom}".`,</p>
+<p class="p1"><span class="Apple-converted-space">              </span>"connected"</p>
+<p class="p1"><span class="Apple-converted-space">            </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>showSelectedPanel();</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>mqttClient.on("reconnect", () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>setStatus(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"Connection interrupted. Reconnecting automatically…",</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"normal"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>mqttClient.on("offline", () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>setStatus(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"Connection temporarily offline. Reconnecting…",</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"normal"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>mqttClient.on("error", error =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>console.error("MQTT error:", error);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>setStatus(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"Realtime connection error. Check the network and try again.",</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"error"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>joinBtn.disabled = false;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>joinBtn.textContent = "Connect";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>mqttClient.on(</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"message",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>async (topic, payload) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>if (topic !== topicName) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const encryptedMessage =</p>
+<p class="p1"><span class="Apple-converted-space">              </span>payload.toString();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const decoded =</p>
+<p class="p1"><span class="Apple-converted-space">              </span>await decryptMessage(encryptedMessage);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!decoded) {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const data = JSON.parse(decoded);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">              </span>Only the Student UI consumes classroom translation</p>
+<p class="p1"><span class="Apple-converted-space">              </span>messages.</p>
+<p class="p1"><span class="Apple-converted-space">            </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (</p>
+<p class="p1"><span class="Apple-converted-space">              </span>selectedRole === "student" &amp;&amp;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>data.type === "translation" &amp;&amp;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>data.spanish</p>
+<p class="p1"><span class="Apple-converted-space">            </span>) {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>updateStudentDisplay(data);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">              </span>Messages on a public broker can come from elsewhere.</p>
+<p class="p1"><span class="Apple-converted-space">              </span>Any payload that cannot be decrypted with this</p>
+<p class="p1"><span class="Apple-converted-space">              </span>classroom's key is simply ignored.</p>
+<p class="p1"><span class="Apple-converted-space">            </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">            </span>console.warn(</p>
+<p class="p1"><span class="Apple-converted-space">              </span>"Ignored unrelated/invalid MQTT message."</p>
+<p class="p1"><span class="Apple-converted-space">            </span>);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function showSelectedPanel() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (selectedRole === "teacher") {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>teacherPanel.classList.remove("hidden");</p>
+<p class="p1"><span class="Apple-converted-space">        </span>studentPanel.classList.add("hidden");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>setupSpeechRecognition();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>teacherPanel.classList.add("hidden");</p>
+<p class="p1"><span class="Apple-converted-space">        </span>studentPanel.classList.remove("hidden");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>studentRoomName.textContent =</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"Session: " + currentRoom;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* ==========================================================</p>
+<p class="p1"><span class="Apple-converted-space">       </span>HASH ROOM NAME INTO MQTT TOPIC</p>
+<p class="p1"><span class="Apple-converted-space">       </span>========================================================== */</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function createHashedTopic(roomName) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const encoder = new TextEncoder();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">        </span>App-specific prefix stops a plain SHA hash lookup of</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"Room101" from directly matching the topic.</p>
+<p class="p1"><span class="Apple-converted-space">      </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const input =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>encoder.encode(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"live-classroom-spanish-v1::" + roomName</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const hash =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>await crypto.subtle.digest(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"SHA-256",</p>
+<p class="p1"><span class="Apple-converted-space">          </span>input</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const bytes =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>Array.from(new Uint8Array(hash));</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const hex =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>bytes</p>
+<p class="p1"><span class="Apple-converted-space">          </span>.map(byte =&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>byte.toString(16).padStart(2, "0")</p>
+<p class="p1"><span class="Apple-converted-space">          </span>)</p>
+<p class="p1"><span class="Apple-converted-space">          </span>.join("");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">        </span>Namespace unique to this app.</p>
+<p class="p1"><span class="Apple-converted-space">      </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return "live-classroom-translator/v1/" + hex;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* ==========================================================</p>
+<p class="p1"><span class="Apple-converted-space">       </span>CLIENT-SIDE ENCRYPTION</p>
+<p class="p1"><span class="Apple-converted-space">       </span>========================================================== */</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function deriveEncryptionKey(roomName) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const encoder = new TextEncoder();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const baseKey =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>await crypto.subtle.importKey(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"raw",</p>
+<p class="p1"><span class="Apple-converted-space">          </span>encoder.encode(roomName),</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"PBKDF2",</p>
+<p class="p1"><span class="Apple-converted-space">          </span>false,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>["deriveKey"]</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>return crypto.subtle.deriveKey(</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">          </span>name: "PBKDF2",</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">            </span>A static application salt is acceptable here because</p>
+<p class="p1"><span class="Apple-converted-space">            </span>the Session Name itself is the shared secret.</p>
+<p class="p1"><span class="Apple-converted-space">          </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">          </span>salt: encoder.encode(</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"live-classroom-translator-encryption-v1"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>),</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>iterations: 120000,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>hash: "SHA-256"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>baseKey,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{</p>
+<p class="p1"><span class="Apple-converted-space">          </span>name: "AES-GCM",</p>
+<p class="p1"><span class="Apple-converted-space">          </span>length: 256</p>
+<p class="p1"><span class="Apple-converted-space">        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>false,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>[</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"encrypt",</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"decrypt"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>]</p>
+<p class="p1"><span class="Apple-converted-space">      </span>);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function encryptMessage(plainText) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const encoder = new TextEncoder();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const iv =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>crypto.getRandomValues(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>new Uint8Array(12)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const encrypted =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>await crypto.subtle.encrypt(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>name: "AES-GCM",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>iv</p>
+<p class="p1"><span class="Apple-converted-space">          </span>},</p>
+<p class="p1"><span class="Apple-converted-space">          </span>encryptionKey,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>encoder.encode(plainText)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>return JSON.stringify({</p>
+<p class="p1"><span class="Apple-converted-space">        </span>iv: arrayBufferToBase64(iv),</p>
+<p class="p1"><span class="Apple-converted-space">        </span>data: arrayBufferToBase64(encrypted)</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function decryptMessage(payload) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const parsed = JSON.parse(payload);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const iv =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>base64ToUint8Array(parsed.iv);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const ciphertext =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>base64ToUint8Array(parsed.data);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const decrypted =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>await crypto.subtle.decrypt(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>name: "AES-GCM",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>iv</p>
+<p class="p1"><span class="Apple-converted-space">          </span>},</p>
+<p class="p1"><span class="Apple-converted-space">          </span>encryptionKey,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>ciphertext</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>return new TextDecoder().decode(decrypted);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function arrayBufferToBase64(buffer) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const bytes =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>new Uint8Array(buffer);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>let binary = "";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>for (let i = 0; i &lt; bytes.byteLength; i++) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>binary += String.fromCharCode(bytes[i]);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>return btoa(binary);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function base64ToUint8Array(base64) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const binary =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>atob(base64);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const bytes =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>new Uint8Array(binary.length);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>for (let i = 0; i &lt; binary.length; i++) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>bytes[i] =</p>
+<p class="p1"><span class="Apple-converted-space">          </span>binary.charCodeAt(i);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>return bytes;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* ==========================================================</p>
+<p class="p1"><span class="Apple-converted-space">       </span>TEACHER: SPEECH RECOGNITION</p>
+<p class="p1"><span class="Apple-converted-space">       </span>========================================================== */</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function setupSpeechRecognition() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (recognition) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const SpeechRecognition =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>window.SpeechRecognition ||</p>
+<p class="p1"><span class="Apple-converted-space">        </span>window.webkitSpeechRecognition;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!SpeechRecognition) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>micBtn.disabled = true;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>micBtn.style.opacity = ".4";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>micLabel.textContent =</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"Speech recognition is not available in this browser. Use the text box below.";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>recognition =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>new SpeechRecognition();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>recognition.lang = "en-US";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>recognition.continuous = true;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>recognition.interimResults = true;</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>recognition.onstart = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>isListening = true;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>micBtn.classList.add("listening");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>micLabel.textContent =</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"Listening… tap again to stop";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>};</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>recognition.onresult = event =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let interimTranscript = "";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let finalTranscript = "";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>for (</p>
+<p class="p1"><span class="Apple-converted-space">          </span>let i = event.resultIndex;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>i &lt; event.results.length;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>i++</p>
+<p class="p1"><span class="Apple-converted-space">        </span>) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>const transcript =</p>
+<p class="p1"><span class="Apple-converted-space">            </span>event.results[i][0].transcript.trim();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>if (event.results[i].isFinal) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>finalTranscript +=</p>
+<p class="p1"><span class="Apple-converted-space">              </span>(finalTranscript ? " " : "") +</p>
+<p class="p1"><span class="Apple-converted-space">              </span>transcript;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>interimTranscript +=</p>
+<p class="p1"><span class="Apple-converted-space">              </span>(interimTranscript ? " " : "") +</p>
+<p class="p1"><span class="Apple-converted-space">              </span>transcript;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">          </span>Show interim speech instantly on the teacher screen,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>but do NOT repeatedly call the free translation API</p>
+<p class="p1"><span class="Apple-converted-space">          </span>for every partial word.</p>
+<p class="p1"><span class="Apple-converted-space">        </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (interimTranscript) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>speechPreview.textContent =</p>
+<p class="p1"><span class="Apple-converted-space">            </span>interimTranscript + " …";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (finalTranscript) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>speechPreview.textContent =</p>
+<p class="p1"><span class="Apple-converted-space">            </span>finalTranscript;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">            </span>Avoid accidental duplicate final events.</p>
+<p class="p1"><span class="Apple-converted-space">          </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">          </span>const now = Date.now();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>const duplicate =</p>
+<p class="p1"><span class="Apple-converted-space">            </span>finalTranscript === lastSpeechText &amp;&amp;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>now - lastSpeechTime &lt; 2500;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>if (!duplicate) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>lastSpeechText = finalTranscript;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>lastSpeechTime = now;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>translateAndBroadcast(</p>
+<p class="p1"><span class="Apple-converted-space">              </span>finalTranscript,</p>
+<p class="p1"><span class="Apple-converted-space">              </span>"speech"</p>
+<p class="p1"><span class="Apple-converted-space">            </span>);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>};</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>recognition.onerror = event =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>console.warn(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"Speech recognition error:",</p>
+<p class="p1"><span class="Apple-converted-space">          </span>event.error</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (</p>
+<p class="p1"><span class="Apple-converted-space">          </span>event.error === "not-allowed" ||</p>
+<p class="p1"><span class="Apple-converted-space">          </span>event.error === "service-not-allowed"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>isListening = false;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>micBtn.classList.remove("listening");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>micLabel.textContent =</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"Microphone permission was blocked. You can still type below.";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>};</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>recognition.onend = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">          </span>Chrome can automatically stop continuous recognition</p>
+<p class="p1"><span class="Apple-converted-space">          </span>after a while. If the teacher still considers the mic</p>
+<p class="p1"><span class="Apple-converted-space">          </span>active, attempt to restart it.</p>
+<p class="p1"><span class="Apple-converted-space">        </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (isListening) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>recognition.start();</p>
+<p class="p1"><span class="Apple-converted-space">          </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>console.warn(error);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>micBtn.classList.remove("listening");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>micLabel.textContent =</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"Tap to start speaking";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>};</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>micBtn.addEventListener("click", () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!recognition) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>setupSpeechRecognition();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!recognition) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (isListening) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>isListening = false;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>recognition.stop();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>console.warn(error);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>micBtn.classList.remove("listening");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>micLabel.textContent =</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"Tap to start speaking";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>recognition.start();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>console.warn(error);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* ==========================================================</p>
+<p class="p1"><span class="Apple-converted-space">       </span>TEACHER: MANUAL TEXT</p>
+<p class="p1"><span class="Apple-converted-space">       </span>========================================================== */</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>sendBtn.addEventListener("click", () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>sendManualMessage();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>manualInput.addEventListener(</p>
+<p class="p1"><span class="Apple-converted-space">      </span>"keydown",</p>
+<p class="p1"><span class="Apple-converted-space">      </span>event =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">          </span>Ctrl+Enter / Cmd+Enter sends.</p>
+<p class="p1"><span class="Apple-converted-space">          </span>Regular Enter remains available for multiline typing.</p>
+<p class="p1"><span class="Apple-converted-space">        </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (</p>
+<p class="p1"><span class="Apple-converted-space">          </span>event.key === "Enter" &amp;&amp;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>(event.ctrlKey || event.metaKey)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>event.preventDefault();</p>
+<p class="p1"><span class="Apple-converted-space">          </span>sendManualMessage();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>);</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function sendManualMessage() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const text =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>manualInput.value.trim();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!text) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>translateAndBroadcast(</p>
+<p class="p1"><span class="Apple-converted-space">        </span>text,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"typed"</p>
+<p class="p1"><span class="Apple-converted-space">      </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>manualInput.value = "";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* ==========================================================</p>
+<p class="p1"><span class="Apple-converted-space">       </span>TRANSLATE ENGLISH → SPANISH</p>
+<p class="p1"><span class="Apple-converted-space">       </span>========================================================== */</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function translateToSpanish(englishText) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">        </span>MyMemory:</p>
+<p class="p1"><span class="Apple-converted-space">          </span>q<span class="Apple-converted-space">        </span>= text to translate</p>
+<p class="p1"><span class="Apple-converted-space">          </span>langpair = source|target</p>
+<p class="p1"><span class="Apple-converted-space">      </span>*/</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const url =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>`${TRANSLATE_URL}?q=${encodeURIComponent(englishText)}&amp;langpair=en|es`;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const response =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>await fetch(url);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!response.ok) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>throw new Error(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"Translation service returned " +</p>
+<p class="p1"><span class="Apple-converted-space">          </span>response.status</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const data =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>await response.json();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (</p>
+<p class="p1"><span class="Apple-converted-space">        </span>!data ||</p>
+<p class="p1"><span class="Apple-converted-space">        </span>!data.responseData ||</p>
+<p class="p1"><span class="Apple-converted-space">        </span>!data.responseData.translatedText</p>
+<p class="p1"><span class="Apple-converted-space">      </span>) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>throw new Error(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"Translation response was incomplete."</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>return decodeHtmlEntities(</p>
+<p class="p1"><span class="Apple-converted-space">        </span>data.responseData.translatedText</p>
+<p class="p1"><span class="Apple-converted-space">      </span>);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">      </span>Translation APIs can occasionally encode apostrophes,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>quotation marks, etc. as HTML entities.</p>
+<p class="p1"><span class="Apple-converted-space">    </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function decodeHtmlEntities(text) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const textarea =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.createElement("textarea");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>textarea.innerHTML = text;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>return textarea.value;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* ==========================================================</p>
+<p class="p1"><span class="Apple-converted-space">       </span>TRANSLATE + REALTIME BROADCAST</p>
+<p class="p1"><span class="Apple-converted-space">       </span>========================================================== */</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function translateAndBroadcast(</p>
+<p class="p1"><span class="Apple-converted-space">      </span>englishText,</p>
+<p class="p1"><span class="Apple-converted-space">      </span>source</p>
+<p class="p1"><span class="Apple-converted-space">    </span>) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (</p>
+<p class="p1"><span class="Apple-converted-space">        </span>!mqttClient ||</p>
+<p class="p1"><span class="Apple-converted-space">        </span>!mqttClient.connected ||</p>
+<p class="p1"><span class="Apple-converted-space">        </span>!encryptionKey</p>
+<p class="p1"><span class="Apple-converted-space">      </span>) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>setStatus(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"The classroom is not connected yet.",</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"error"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const cleanText =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>englishText.trim();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!cleanText) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>teacherSpanishPreview.textContent =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"Translating…";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>sendBtn.classList.add("loading");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const spanish =</p>
+<p class="p1"><span class="Apple-converted-space">          </span>await translateToSpanish(cleanText);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>teacherSpanishPreview.textContent =</p>
+<p class="p1"><span class="Apple-converted-space">          </span>spanish;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const message = {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>type: "translation",</p>
+<p class="p1"><span class="Apple-converted-space">          </span>source,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>english: cleanText,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>spanish,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>timestamp: Date.now()</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">          </span>Encrypt BEFORE publishing.</p>
+<p class="p1"><span class="Apple-converted-space">        </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const encryptedPayload =</p>
+<p class="p1"><span class="Apple-converted-space">          </span>await encryptMessage(</p>
+<p class="p1"><span class="Apple-converted-space">            </span>JSON.stringify(message)</p>
+<p class="p1"><span class="Apple-converted-space">          </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>mqttClient.publish(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>topicName,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>encryptedPayload,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">              </span>QoS 1 = at least once delivery.</p>
+<p class="p1"><span class="Apple-converted-space">              </span>The student code safely tolerates an occasional</p>
+<p class="p1"><span class="Apple-converted-space">              </span>duplicate.</p>
+<p class="p1"><span class="Apple-converted-space">            </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">            </span>qos: 1,</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">              </span>Do not retain classroom speech on the broker.</p>
+<p class="p1"><span class="Apple-converted-space">            </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">            </span>retain: false</p>
+<p class="p1"><span class="Apple-converted-space">          </span>},</p>
+<p class="p1"><span class="Apple-converted-space">          </span>error =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (error) {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>console.error(error);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">              </span>setStatus(</p>
+<p class="p1"><span class="Apple-converted-space">                </span>"Translation completed but could not be sent.",</p>
+<p class="p1"><span class="Apple-converted-space">                </span>"error"</p>
+<p class="p1"><span class="Apple-converted-space">              </span>);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>console.error(error);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>teacherSpanishPreview.textContent =</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"Translation unavailable. Please try again.";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>} finally {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>sendBtn.classList.remove("loading");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* ==========================================================</p>
+<p class="p1"><span class="Apple-converted-space">       </span>STUDENT DISPLAY</p>
+<p class="p1"><span class="Apple-converted-space">       </span>========================================================== */</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function updateStudentDisplay(data) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>latestSpanish = data.spanish;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>spanishDisplay.classList.remove("waiting");</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>spanishDisplay.textContent =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>data.spanish;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>speakerBtn.disabled = false;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const date =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>new Date(data.timestamp || Date.now());</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>messageTime.textContent =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"Received " +</p>
+<p class="p1"><span class="Apple-converted-space">        </span>date.toLocaleTimeString(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>[],</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{</p>
+<p class="p1"><span class="Apple-converted-space">            </span>hour: "numeric",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>minute: "2-digit",</p>
+<p class="p1"><span class="Apple-converted-space">            </span>second: "2-digit"</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* ==========================================================</p>
+<p class="p1"><span class="Apple-converted-space">       </span>STUDENT TEXT-TO-SPEECH</p>
+<p class="p1"><span class="Apple-converted-space">       </span>========================================================== */</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>speakerBtn.addEventListener("click", () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!latestSpanish) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">        </span>Stop previous speech before starting another.</p>
+<p class="p1"><span class="Apple-converted-space">      </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">      </span>window.speechSynthesis.cancel();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const utterance =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>new SpeechSynthesisUtterance(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>latestSpanish</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>utterance.lang = "es-ES";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>utterance.rate = 0.9;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>utterance.pitch = 1;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>/*</p>
+<p class="p1"><span class="Apple-converted-space">        </span>Try to use an installed Spanish voice when available.</p>
+<p class="p1"><span class="Apple-converted-space">      </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const voices =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>window.speechSynthesis.getVoices();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const spanishVoice =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>voices.find(voice =&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>voice.lang</p>
+<p class="p1"><span class="Apple-converted-space">            </span>.toLowerCase()</p>
+<p class="p1"><span class="Apple-converted-space">            </span>.startsWith("es")</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (spanishVoice) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>utterance.voice =</p>
+<p class="p1"><span class="Apple-converted-space">          </span>spanishVoice;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>window.speechSynthesis.speak(</p>
+<p class="p1"><span class="Apple-converted-space">        </span>utterance</p>
+<p class="p1"><span class="Apple-converted-space">      </span>);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* ==========================================================</p>
+<p class="p1"><span class="Apple-converted-space">       </span>STATUS HELPER</p>
+<p class="p1"><span class="Apple-converted-space">       </span>========================================================== */</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function setStatus(text, type = "normal") {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>connectionStatusText.textContent =</p>
+<p class="p1"><span class="Apple-converted-space">        </span>text;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>connectionStatus.classList.remove(</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"connected",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>"error"</p>
+<p class="p1"><span class="Apple-converted-space">      </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (type === "connected") {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>connectionStatus.classList.add(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"connected"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (type === "error") {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>connectionStatus.classList.add(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>"error"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* ==========================================================</p>
+<p class="p1"><span class="Apple-converted-space">       </span>CLEANUP</p>
+<p class="p1"><span class="Apple-converted-space">       </span>========================================================== */</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>window.addEventListener(</p>
+<p class="p1"><span class="Apple-converted-space">      </span>"beforeunload",</p>
+<p class="p1"><span class="Apple-converted-space">      </span>() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (recognition) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>isListening = false;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>recognition.stop();</p>
+<p class="p1"><span class="Apple-converted-space">          </span>} catch (error) {}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (mqttClient) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>mqttClient.end(true);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>} catch (error) {}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>window.speechSynthesis.cancel();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
