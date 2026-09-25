@@ -585,88 +585,43 @@
     );
 
 
-    async function connectToRoom() {
+   async function connectToRoom() {
 
-      if (!role) {
+  if (!role) {
+    setStatus(
+      "Please choose Teacher or Student first.",
+      "error"
+    );
 
-        setStatus(
-          "Please choose Teacher or Student first.",
-          "error"
-        );
+    return;
+  }
 
-        return;
-      }
+  const enteredRoom =
+    roomInput.value.trim();
 
+  if (enteredRoom.length < 4) {
+    setStatus(
+      "Please enter a Session Name with at least 4 characters.",
+      "error"
+    );
 
-      const enteredRoom =
-        roomInput.value.trim();
+    return;
+  }
 
+  roomName = enteredRoom;
 
-      if (enteredRoom.length < 4) {
+  connectButton.disabled = false;
 
-        setStatus(
-          "Please enter a Session Name with at least 4 characters.",
-          "error"
-        );
+  connectButton.textContent =
+    "Reconnect";
 
-        return;
-      }
+  setStatus(
+    'Connected to "' + roomName + '".',
+    "connected"
+  );
 
-
-      roomName = enteredRoom;
-
-
-      if (mqttClient) {
-
-        try {
-          mqttClient.end(true);
-        } catch (error) {
-          console.log(error);
-        }
-
-      }
-
-
-      connectButton.disabled = true;
-
-      connectButton.textContent =
-        "Connecting...";
-
-
-      setStatus(
-        "Preparing classroom connection..."
-      );
-
-
-      try {
-
-        mqttTopic =
-          await createTopic(roomName);
-
-        encryptionKey =
-          await createEncryptionKey(roomName);
-
-        startMQTT();
-
-      }
-
-      catch (error) {
-
-        console.error(error);
-
-        setStatus(
-          "Unable to prepare the classroom connection.",
-          "error"
-        );
-
-        connectButton.disabled = false;
-
-        connectButton.textContent =
-          "Connect";
-
-      }
-
-    }
+  showCorrectScreen();
+}
 
 
     function startMQTT() {
@@ -855,7 +810,7 @@
 
         studentRoom.textContent =
           "Session: " + roomName;
-
+startStudentPolling();
       }
 
     }
@@ -1457,81 +1412,123 @@
 
 
     async function translateAndSend(
-      englishText
-    ) {
+  englishText
+) {
 
-      if (
-        !mqttClient ||
-        !mqttClient.connected
-      ) {
+  teacherSpanish.textContent =
+    "Translating...";
 
-        setStatus(
-          "The classroom is not connected.",
-          "error"
-        );
+  try {
 
-        return;
-      }
+    const spanish =
+      await translateToSpanish(
+        englishText
+      );
 
+    teacherSpanish.textContent =
+      spanish;
 
-      teacherSpanish.textContent =
-        "Translating...";
+    sendToGoogleRelay(
+      englishText,
+      spanish
+    );
 
+  }
 
-      try {
+  catch (error) {
 
-        const spanish =
-          await translateToSpanish(
-            englishText
-          );
+    console.error(error);
 
+    teacherSpanish.textContent =
+      "Translation unavailable. Please try again.";
 
-        teacherSpanish.textContent =
-          spanish;
+  }
 
+}
+    function googleJsonp(params, callback) {
+  const callbackName =
+    "googleRelay_" + Date.now() + "_" +
+    Math.random().toString(36).slice(2);
 
-        const message =
-          {
-            type: "translation",
+  const script = document.createElement("script");
 
-            english:
-              englishText,
-
-            spanish:
-              spanish,
-
-            timestamp:
-              Date.now()
-          };
-
-
-        const encrypted =
-          await encryptMessage(
-            JSON.stringify(message)
-          );
-
-
-        mqttClient.publish(
-          mqttTopic,
-          encrypted,
-          {
-            qos: 1,
-            retain: false
-          }
-        );
-
-      }
-
-      catch (error) {
-
-        console.error(error);
-
-        teacherSpanish.textContent =
-          "Translation unavailable. Please try again.";
-
-      }
-
+  window[callbackName] = function(data) {
+    try {
+      callback(data);
+    } finally {
+      delete window[callbackName];
+      script.remove();
     }
+  };
+
+  const query = new URLSearchParams({
+    ...params,
+    callback: callbackName,
+    _: Date.now()
+  });
+
+  script.src =
+    GOOGLE_RELAY_URL + "?" + query.toString();
+
+  script.onerror = function() {
+    console.error("Google relay connection failed.");
+    delete window[callbackName];
+    script.remove();
+  };
+
+  document.body.appendChild(script);
+}
+
+
+function sendToGoogleRelay(english, spanish) {
+  googleJsonp(
+    {
+      action: "send",
+      room: roomName,
+      english: english,
+      spanish: spanish
+    },
+    function(data) {
+      console.log("Google relay sent:", data);
+    }
+  );
+}
+
+
+function startStudentPolling() {
+  if (studentPollTimer) {
+    clearInterval(studentPollTimer);
+  }
+
+  function checkForMessage() {
+    googleJsonp(
+      {
+        action: "get",
+        room: roomName
+      },
+      function(data) {
+        if (
+          data &&
+          data.ok &&
+          data.message &&
+          data.message.timestamp > lastStudentTimestamp
+        ) {
+          lastStudentTimestamp =
+            data.message.timestamp;
+
+          showStudentTranslation(
+            data.message
+          );
+        }
+      }
+    );
+  }
+
+  checkForMessage();
+
+  studentPollTimer =
+    setInterval(checkForMessage, 1000);
+}
 
 
     function showStudentTranslation(
