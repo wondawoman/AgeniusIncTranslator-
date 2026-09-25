@@ -1411,39 +1411,44 @@ startStudentPolling();
     }
 
 
-    async function translateAndSend(
-  englishText
-) {
+   async function translateAndSend(englishText) {
 
   teacherSpanish.textContent =
     "Translating...";
 
-  try {
+  googleJsonp(
+    {
+      action: "translate",
+      text: englishText
+    },
+    function(data) {
 
-    const spanish =
-      await translateToSpanish(
-        englishText
-      );
+      if (
+        data &&
+        data.ok &&
+        data.spanish
+      ) {
 
-    teacherSpanish.textContent =
-      spanish;
+        teacherSpanish.textContent =
+          data.spanish;
 
-    sendToGoogleRelay(
-      englishText,
-      spanish
-    );
+        sendToGoogleRelay(
+          englishText,
+          data.spanish
+        );
 
-  }
+      } else {
 
-  catch (error) {
+        teacherSpanish.textContent =
+          "Translation unavailable. Please try again.";
 
-    console.error(error);
-
-    teacherSpanish.textContent =
-      "Translation unavailable. Please try again.";
-
-  }
-
+        console.error(
+          "Translation failed:",
+          data
+        );
+      }
+    }
+  );
 }
     function googleJsonp(params, callback) {
   const callbackName =
